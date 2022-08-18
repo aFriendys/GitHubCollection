@@ -107,6 +107,11 @@ function onChange(event) {
   if (event.keyCode === 13) {
     return;
   }
+  if (event.keyCode === 8 && event.target.value == 0) {
+    searchDropdown.classList.remove("search__dropdown--active");
+    return;
+  }
+  
   searchLoading.classList.add("search__loading--active");
 
   while (searchDropdown.firstChild) {
