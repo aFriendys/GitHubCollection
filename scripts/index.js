@@ -23,11 +23,21 @@ const svgIcon = {
   searchInput = document.querySelector(".search__input"),
   searchLoading = document.querySelector(".search__loading"),
   repositoriesWrapper = document.querySelector(".repositories__wrapper"),
-  form = document.getElementsByTagName("form")[0];
+  form = document.getElementsByTagName("form")[0],
+  validKeys = /[a-zA-Z0-9\/]/g;
 
 form.addEventListener("keypress", (event) => {
   if (event.keyCode === 13) event.preventDefault();
 });
+
+function removeInvalidChars(value) {
+  return value
+    .split("")
+    .filter((elem) => {
+      return elem.match(validKeys);
+    })
+    .join("");
+}
 
 function debounce(func, delay) {
   let inDebounce;
@@ -104,20 +114,24 @@ function addRepository(parent, data) {
 }
 
 function onChange(event) {
-  if (event.keyCode === 13) {
-    return;
-  }
   if (event.keyCode === 8 && event.target.value == 0) {
     searchDropdown.classList.remove("search__dropdown--active");
     return;
   }
-  
-  searchLoading.classList.add("search__loading--active");
 
-  while (searchDropdown.firstChild) {
-    searchDropdown.removeChild(searchDropdown.lastChild);
+  if (event.key.length === 1) {
+    if (event.key.match(validKeys)) {
+      searchLoading.classList.add("search__loading--active");
+
+      while (searchDropdown.firstChild) {
+        searchDropdown.removeChild(searchDropdown.lastChild);
+      }
+      event.target.value = removeInvalidChars(event.target.value);
+      generateDropdown(event.target.value);
+    } else {
+      event.target.value = removeInvalidChars(event.target.value);
+    }
   }
-  generateDropdown(event.target.value);
 }
 
 onChange = debounce(onChange, 500);
