@@ -30,8 +30,8 @@ form.addEventListener("keypress", (event) => {
   if (event.keyCode === 13) event.preventDefault();
 });
 
-function removeInvalidChars(value) {
-  return value
+function removeInvalidChars(string) {
+  return string
     .split("")
     .filter((elem) => {
       return elem.match(validKeys);
