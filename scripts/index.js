@@ -115,9 +115,8 @@ function addRepository(parent, data) {
 
 function onChange(event) {
   event.target.value = removeInvalidChars(event.target.value);
-
-  if (event.target.value.length !== 0) {
-    if(event.key.length === 1){
+  if (event.key.length === 1 || event.keyCode ===8) {
+    if(event.target.value.length !== 0){
     searchLoading.classList.add("search__loading--active");
 
     while (searchDropdown.firstChild) {
