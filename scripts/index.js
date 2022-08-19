@@ -114,23 +114,19 @@ function addRepository(parent, data) {
 }
 
 function onChange(event) {
-  if (event.keyCode === 8 && event.target.value == 0) {
-    searchDropdown.classList.remove("search__dropdown--active");
-    return;
-  }
+  event.target.value = removeInvalidChars(event.target.value);
 
-  if (event.key.length === 1) {
-    if (event.key.match(validKeys)) {
-      searchLoading.classList.add("search__loading--active");
+  if (event.target.value.length !== 0) {
+    if(event.key.length === 1){
+    searchLoading.classList.add("search__loading--active");
 
-      while (searchDropdown.firstChild) {
-        searchDropdown.removeChild(searchDropdown.lastChild);
-      }
-      event.target.value = removeInvalidChars(event.target.value);
-      generateDropdown(event.target.value);
-    } else {
-      event.target.value = removeInvalidChars(event.target.value);
+    while (searchDropdown.firstChild) {
+      searchDropdown.removeChild(searchDropdown.lastChild);
     }
+    generateDropdown(event.target.value);
+  }
+  }else{
+    searchDropdown.classList.remove("search__dropdown--active");
   }
 }
 
