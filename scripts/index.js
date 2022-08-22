@@ -85,7 +85,7 @@ function addRepository(parent, data) {
   repositoryLink.setAttribute("target", "_blank");
   repositoryLink.setAttribute(
     "title",
-    `Go to repository "${data.name}" on github`
+    `Follow repository "${data.name}" on github`
   );
 
   repositoryDeleteIcon.addEventListener("click", (event) => {
@@ -177,8 +177,12 @@ function generateDropdown(value) {
     });
 }
 
-form.addEventListener("keypress", (event) => {
-  if (event.keyCode === 13) event.preventDefault();
-});
 onInputChange = debounce(onInputChange, 500);
+
 searchInput.addEventListener("input", onInputChange);
+
+form.addEventListener("keypress", (event) => {
+  if (event.keyCode === 13) {
+    event.preventDefault();
+  }
+});
