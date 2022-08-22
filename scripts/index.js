@@ -24,11 +24,14 @@ const svgIcon = {
   searchLoading = document.querySelector(".search__loading"),
   repositoriesWrapper = document.querySelector(".repositories__wrapper"),
   form = document.getElementsByTagName("form")[0],
-  validKeys = /[a-zA-Z0-9\/]/g;
-
-form.addEventListener("keypress", (event) => {
-  if (event.keyCode === 13) event.preventDefault();
-});
+  validKeys = /[a-zA-Z0-9\/]/g,
+  debounce = (func, delay) => {
+    let inDebounce;
+    return function () {
+      clearTimeout(inDebounce);
+      inDebounce = setTimeout(() => func.apply(this, arguments), delay);
+    };
+  };
 
 function removeInvalidChars(string, chars) {
   return string
@@ -37,16 +40,6 @@ function removeInvalidChars(string, chars) {
       return elem.match(chars);
     })
     .join("");
-}
-
-function debounce(func, delay) {
-  let inDebounce;
-  return function () {
-    const context = this,
-      args = arguments;
-    clearTimeout(inDebounce);
-    inDebounce = setTimeout(() => func.apply(context, args), delay);
-  };
 }
 
 function generateSvgIcon(name) {
@@ -100,12 +93,14 @@ function addRepository(parent, data) {
     `Go to repository "${data.name}" on github`
   );
 
-  repositoryDeleteIcon.addEventListener("click", () => {
+  repositoryDeleteIcon.addEventListener("click", (event) => {
+    repository.onclick = null;
     repository.style.animation = "delete .3s linear";
   });
 
   repository.addEventListener("animationend", (event) => {
     if (event.animationName === "delete") {
+      repository.onanimationend = null;
       repository.remove();
     }
   });
@@ -113,25 +108,17 @@ function addRepository(parent, data) {
   parent.appendChild(fragment);
 }
 
-function onChange(event) {
-  event.target.value = removeInvalidChars(event.target.value, validKeys);
-  if (event.key.length === 1 || event.keyCode === 8) {
-    if(event.target.value.length !== 0){
-    searchLoading.classList.add("search__loading--active");
-
-    while (searchDropdown.firstChild) {
-      searchDropdown.removeChild(searchDropdown.lastChild);
-    }
+function onInputChange(event) {
+  while (searchDropdown.firstChild) {
+    searchDropdown.removeChild(searchDropdown.lastChild);
+  }
+  if (event.data !== null || !event.data.match(validKeys)) {
+    event.target.value = removeInvalidChars(event.target.value, validKeys);
+  }
+  if (event.target.value.length !== 0) {
     generateDropdown(event.target.value);
   }
-  }else{
-    searchDropdown.classList.remove("search__dropdown--active");
-  }
 }
-
-onChange = debounce(onChange, 500);
-
-searchInput.addEventListener("keyup", onChange);
 
 function fetchData(url) {
   return fetch(url).then((response) => {
@@ -153,6 +140,7 @@ function fetchData(url) {
 }
 
 function generateDropdown(value) {
+  searchLoading.classList.add("search__loading--active");
   searchDropdown.classList.remove("search__dropdown--active");
   fetchData(requestURL + value + "&per_page=5")
     .then((data) => {
@@ -193,3 +181,9 @@ function generateDropdown(value) {
       return true;
     });
 }
+
+form.addEventListener("keypress", (event) => {
+  if (event.keyCode === 13) event.preventDefault();
+});
+onInputChange = debounce(onInputChange, 500);
+searchInput.addEventListener("input", onInputChange);
