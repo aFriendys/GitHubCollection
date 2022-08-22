@@ -34,12 +34,7 @@ const svgIcon = {
   };
 
 function removeInvalidChars(string, chars) {
-  return string
-    .split("")
-    .filter((elem) => {
-      return elem.match(chars);
-    })
-    .join("");
+  return [...string].filter((elem) => elem.match(chars)).join("");
 }
 
 function generateSvgIcon(name) {
@@ -112,7 +107,7 @@ function onInputChange(event) {
   while (searchDropdown.firstChild) {
     searchDropdown.removeChild(searchDropdown.lastChild);
   }
-  if (event.data !== null || !event.data.match(validKeys)) {
+  if (event.data !== null && !event.data.match(validKeys)) {
     event.target.value = removeInvalidChars(event.target.value, validKeys);
   }
   if (event.target.value.length !== 0) {
